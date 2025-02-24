@@ -12,7 +12,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="min-h-[calc(100vh-68px)] flex flex-1 flex-col justify-center    ">
+      <div className="min-h-[calc(100vh-68px)] flex flex-1 flex-col justify-center   py-10 ">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm ">
           <img
             alt="Your Company"
