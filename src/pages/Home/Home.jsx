@@ -1,9 +1,8 @@
-import React from 'react';
 
 const Home = () => {
     return (
         <div>
-            
+            <h1 className="font-poppins">Home</h1>
         </div>
     );
 };
