@@ -1,26 +1,48 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { saveImage } from "../../utils/utils";
+import { useContext } from "react";
+import { AuthContext } from "../../AuthProvider/AuthProvider";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
+  const {handleCreateUser, handleUpdateUserProfile} = useContext(AuthContext);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const [fileName, setFileName] = useState("Choose File");
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setFileName(file.name);
-    } else {
-      setFileName("Choose File");
-    }
-  };
+const navigate = useNavigate()
 
+  // Handle form submission
   const signUpForm = async (data) => {
-    console.log(data);
+    const name = data.name;
+    const email = data.email;
+    const password = data.password;
+    const image = data.photo[0]; 
+
+
+    try {
+      // Send image to Cloudinary get image URL
+      const imageURL = await saveImage(image);
+
+      // Create user with email and password
+      await handleCreateUser(email, password)
+
+      // Update user profile with name and photo
+      await handleUpdateUserProfile(name, imageURL);
+
+      // toast success message
+      toast.success("User created successfully");
+
+      // Redirect to home page
+      navigate('/')
+
+
+    } catch (error) {
+      console.log("Image Upload Error:", error);
+    }
   };
 
   return (
@@ -49,11 +71,13 @@ const SignUp = () => {
             <div className="mt-2">
               <input
                 type="text"
-                required
-                {...register("name", { required: "Name is required" })}
+                {...register("name", {
+                  required: "Name is required",
+                  message: "Invalid name",
+                })}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               />
-              {errors.email && (
+              {errors.name && (
                 <span className="text-red-500 text-sm">
                   {errors.name.message}
                 </span>
@@ -69,22 +93,22 @@ const SignUp = () => {
               Photo
             </label>
             <div className="mt-2">
-              {/* Hidden file input */}
+              {/* Hidden File Input */}
               <input
                 type="file"
                 id="photo"
                 {...register("photo", { required: "Photo is required" })}
-                className="hidden"
-                onChange={handleFileChange}
+                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                accept="image/*"
               />
 
               {/* Custom Upload Button */}
-              <label
+              {/* <label
                 htmlFor="photo"
-                className="cursor-pointer block w-full rounded-md  px-3 py-2 text-gray-900 text-start outline-1 -outline-offset-1 outline-gray-300"
+                className="cursor-pointer block w-full rounded-md px-3 py-2 text-gray-900 text-start outline-1 -outline-offset-1 outline-gray-300"
               >
-                {fileName}
-              </label>
+                {selectedFile?.[0]?.name || fileName}
+              </label> */}
 
               {/* Error Message */}
               {errors.photo && (
@@ -104,8 +128,8 @@ const SignUp = () => {
             </label>
             <div className="mt-2">
               <input
+                autoComplete="email"
                 type="email"
-                required
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -142,9 +166,8 @@ const SignUp = () => {
             </div>
             <div className="mt-2">
               <input
-                type="password"
-                required
                 autoComplete="current-password"
+                type="password"
                 {...register("password", {
                   required: "Passwoard is required",
                   minLength: { value: 6 },

@@ -1,13 +1,28 @@
+import { createContext } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider/AuthProvider";
+import toast from "react-hot-toast";
 
 const Login = () => {
-
+  const {handleSignIn} = createContext(AuthContext);
     const {register, handleSubmit , formState:{errors}} = useForm();
 
+    const navigate = useNavigate();
 
     const logInForm = async(data) => {
-        console.log(data);
+
+        const email = data.email;
+        const password = data.password;
+
+        try {
+          await handleSignIn(email, password);
+          toast.success('Login Successfull');
+          navigate('/');
+        }catch(error){
+            console.log(error);
+        }
+
     }
 
   return (
