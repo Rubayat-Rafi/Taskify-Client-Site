@@ -7,6 +7,7 @@ const Main = () => {
 
     {/* this is Navbar */}
       <Navbar />
+     
 
       {/* this is Main layout */}
       <main>

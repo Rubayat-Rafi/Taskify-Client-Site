@@ -1,29 +1,30 @@
-import { createContext } from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider/AuthProvider";
 import toast from "react-hot-toast";
 
 const Login = () => {
-  const {handleSignIn} = createContext(AuthContext);
-    const {register, handleSubmit , formState:{errors}} = useForm();
+  const {handleSignIn} = useContext(AuthContext);
 
+    const {register, handleSubmit , formState:{errors}} = useForm();
     const navigate = useNavigate();
 
-    const logInForm = async(data) => {
-
-        const email = data.email;
-        const password = data.password;
-
-        try {
-          await handleSignIn(email, password);
-          toast.success('Login Successfull');
-          navigate('/');
-        }catch(error){
-            console.log(error);
-        }
-
-    }
+    const logInForm = async (data) => {
+      const email = data.email;
+      const password = data.password;
+  
+      try {
+          const user = await handleSignIn(email, password);
+          if (user) {
+              toast.success("Login Successful");
+              navigate("/");
+          }
+      } catch (error) {
+          console.error("Login Error:", error);
+          toast.error("Login failed. Please check your credentials.");
+      }
+  };
 
   return (
     <>
@@ -49,7 +50,6 @@ const Login = () => {
               <div className="mt-2">
                 <input
                   type="email"
-                  required
                   {...register('email',{required: 'Email is required', pattern: {value:/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: 'Invalid email'}})}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
@@ -71,7 +71,6 @@ const Login = () => {
               <div className="mt-2">
                 <input
                   type="password"
-                  required
                   autoComplete="current-password"
                   {...register('password', {required: 'Passwoard is required', minLength:{value:6}, message: 'Password must be at least 6 characters'})}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
