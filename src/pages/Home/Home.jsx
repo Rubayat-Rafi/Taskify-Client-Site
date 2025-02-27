@@ -3,12 +3,16 @@ import { MdAdd } from "react-icons/md";
 import AddTask from "./AddTask";
 
 
+
 const Home = () => {
 
 
   return (
     <>
       <div className="container mx-auto py-12">
+
+      
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
           {/* task card  */}
           <TaskCard
